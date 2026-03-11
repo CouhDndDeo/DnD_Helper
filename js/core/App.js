@@ -4,9 +4,9 @@
  * @module App
  */
 
-import { ModuleManager } from './ModuleManager.js';
-import { EventBus } from './EventBus.js';
-import { Storage } from './Storage.js';
+import { ModuleManager } from '../ModuleManager.js';
+import { EventBus } from '../EventBus.js';
+import { Storage } from '../Storage.js';
 
 // ============================================================================
 // КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ
