@@ -3,7 +3,7 @@
  * @module ModuleManager
  */
 
-import { EventBus } from './EventBus.js';
+import { EventBus } from '../EventBus.js';
 
 // ============================================================================
 // ГЛОБАЛЬНЫЕ КОНСТАНТЫ (вне класса, в начале файла)
