@@ -619,6 +619,9 @@ export const DiceUtils = {
   DiceRoll,
   RollResult
 };
+// ✅ Экспорт функции parse (главный парсер)
+export function parse(formula, options = {}) { ... }
 
-// Экспорт по умолчанию
+// ✅ И в конце файла:
+export { parse }; // или просто оставить export function parse...
 export default DiceUtils;
