@@ -171,19 +171,30 @@ async setActiveSystem(system) {
 
   return true;
 }
-  /**
- * Динамическая загрузка системы из модуля
- * @async
- * @param {string} systemId - 'dnd5e' | 'daggerheart'
- * @param {Function} importFn - Функция динамического импорта
- * @returns {Promise<RPGSystem>}
- */
+  // ============================================================================
+// В НАЧАЛЕ ФАЙЛА: определение базового пути для GitHub Pages
+// ============================================================================
+const getRepoBasePath = () => {
+  const hostname = window.location.hostname;
+  if (hostname.includes('github.io')) {
+    // Извлекаем имя репозитория: username.github.io/REPO_NAME/
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    return `/${parts[0]}/`;
+  }
+  return '/';
+};
+
+const REPO_BASE = getRepoBasePath();
+console.log('[ModuleManager] Base path:', REPO_BASE);
+
+// ============================================================================
+// МЕТОД loadSystem — ИСПРАВЛЕННЫЙ
+// ============================================================================
 async loadSystem(systemId, importFn) {
   try {
-    // Если importFn не передан, используем дефолтные пути
     const loader = importFn || (() => {
-      // ✅ Пути относительно корня GitHub Pages сайта
-      const basePath = '/DnD_Helper/js/systems/';
+      // ✅ Пути с учётом базового пути репозитория
+      const basePath = `${REPO_BASE}js/systems/`;
       
       const loaders = {
         'dnd5e': () => import(`${basePath}dnd5e.js`),
@@ -198,10 +209,11 @@ async loadSystem(systemId, importFn) {
     
     const module = await loader();
     const exports = Object.keys(module);
+    // Ищем класс, заканчивающийся на "System"
     const SystemClass = module[exports.find(k => k.endsWith('System')) || exports[0]];
     
     if (!SystemClass) {
-      throw new Error(`No system class found in module "${systemId}"`);
+      throw new Error(`No system class found in module "${systemId}". Exports: ${exports.join(', ')}`);
     }
     
     const system = new SystemClass();
