@@ -1,7 +1,7 @@
 /**
  * D&D 5e System Implementation
  */
-import { RPGSystem } from './rpg-system.base.js';
+import { RPGSystem } from '../rpg-system.base.js';
 import { parse, buildAdvantageFormula } from '../utils/diceParser.js'; // ✅ Правильный импорт
 
 export class DnD5eSystem extends RPGSystem {
