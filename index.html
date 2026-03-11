@@ -3,26 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Модульный помощник для игроков и мастеров НРИ">
   <title>🎲 CouchHelper</title>
   <link rel="stylesheet" href="css/main.css" />
 </head>
-<body>
+<body data-system="dnd5e">
   <div id="app">
-    <nav id="main-nav">
-      <button data-module="dice">🎲 Кубы</button>
-      <button data-module="characters">👤 Персонажи</button>
-      <button data-module="generators">🎲 Генераторы</button>
-      <button data-module="notes">📝 Заметки</button>
-      <select id="system-select">
-        <option value="dnd5e">D&D 5e</option>
-        <option value="daggerheart">Daggerheart</option>
-      </select>
+    <!-- Навигация -->
+    <nav id="main-nav" role="navigation" aria-label="Основная навигация">
+      <div class="nav-brand">
+        <h1>🎲 CouchHelper</h1>
+        <small v-if="debug">v0.1.0</small>
+      </div>
+      
+      <div class="nav-links" role="tablist">
+        <button 
+          data-module="dice" 
+          role="tab" 
+          aria-selected="true"
+          class="nav-btn active">
+          🎲 Кубы
+        </button>
+        <button 
+          data-module="characters" 
+          role="tab"
+          class="nav-btn">
+          👤 Персонажи
+        </button>
+        <button 
+          data-module="generators" 
+          role="tab"
+          class="nav-btn">
+          🗺️ Генераторы
+        </button>
+        <button 
+          data-module="notes" 
+          role="tab"
+          class="nav-btn">
+          📝 Заметки
+        </button>
+      </div>
+      
+      <div class="nav-controls">
+        <label for="system-select" class="visually-hidden">Игровая система</label>
+        <select id="system-select" aria-label="Выбор игровой системы">
+          <option value="dnd5e">🐉 D&D 5e</option>
+          <option value="daggerheart">🗡️ Daggerheart</option>
+        </select>
+      </div>
     </nav>
-    <main id="module-container">
-      <!-- Модули загружаются сюда динамически -->
+
+    <!-- Контейнер для модулей -->
+    <main id="module-container" role="tabpanel" aria-live="polite">
+      <!-- Сюда динамически загружаются модули -->
+      <div class="loading-wrapper">
+        <div class="loading-spinner"></div>
+        <p>Инициализация приложения...</p>
+      </div>
     </main>
   </div>
-  
+
+  <!-- Точка входа приложения -->
   <script type="module" src="js/core/App.js"></script>
 </body>
 </html>
