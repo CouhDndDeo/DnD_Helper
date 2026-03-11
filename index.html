@@ -1,1 +1,28 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎲 CouchHelper</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <div id="app">
+    <nav id="main-nav">
+      <button data-module="dice">🎲 Кубы</button>
+      <button data-module="characters">👤 Персонажи</button>
+      <button data-module="generators">🎲 Генераторы</button>
+      <button data-module="notes">📝 Заметки</button>
+      <select id="system-select">
+        <option value="dnd5e">D&D 5e</option>
+        <option value="daggerheart">Daggerheart</option>
+      </select>
+    </nav>
+    <main id="module-container">
+      <!-- Модули загружаются сюда динамически -->
+    </main>
+  </div>
+  
+  <script type="module" src="js/core/App.js"></script>
+</body>
+</html>
