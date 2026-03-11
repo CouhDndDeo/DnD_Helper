@@ -1,7 +1,7 @@
 /**
  * Daggerheart System Implementation
  */
-import { RPGSystem } from './rpg-system.base.js';
+import { RPGSystem } from '../rpg-system.base.js';
 import { parse, executeRoll } from '../utils/diceParser.js'; // ✅ Правильный импорт
 
 export class DaggerheartSystem extends RPGSystem {
