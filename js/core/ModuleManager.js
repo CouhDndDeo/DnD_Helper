@@ -110,33 +110,67 @@ export class ModuleManager {
   // ============================================================================
 
   /**
-   * Установка активной игровой системы
-   * @async
-   * @param {RPGSystem} system - Экземпляр системы
-   * @returns {Promise<boolean>}
-   */
-  async setActiveSystem(system) {
-    if (!system || !system.id) {
-      throw new Error('System must have an "id" property');
+ * Установка активной игровой системы
+ * @param {RPGSystem|string} system - Экземпляр системы ИЛИ ID системы
+ * @returns {Promise<boolean>}
+ */
+async setActiveSystem(system) {
+  // Поддержка передачи только ID строки
+  if (typeof system === 'string') {
+    const systemId = system;
+    
+    // Проверяем, есть ли уже загруженная система с таким ID
+    if (this.activeSystem?.id === systemId) {
+      return true; // Уже активна
     }
-
-    const oldSystem = this.activeSystem?.id;
-    this.activeSystem = system;
-
-    this._log(`🔄 System changed: ${oldSystem || 'none'} → ${system.id}`);
     
-    // Уведомляем модули о смене системы
-    await this._notifyModules('onSystemChange', system);
+    // Пытаемся загрузить систему динамически
+    const systemLoaders = {
+      'dnd5e': () => import('../systems/dnd5e.js'),
+      'daggerheart': () => import('../systems/daggerheart.js')
+    };
     
-    this._emit('system:changed', { 
-      systemId: system.id, 
-      system,
-      previous: oldSystem 
-    });
-
-    return true;
+    const loader = systemLoaders[systemId];
+    if (!loader) {
+      throw new Error(`No loader for system "${systemId}"`);
+    }
+    
+    try {
+      const module = await loader();
+      const SystemClass = module[Object.keys(module)[0]];
+      
+      if (!SystemClass) {
+        throw new Error(`No export found in system module "${systemId}"`);
+      }
+      
+      system = new SystemClass(); // Создаём экземпляр
+    } catch (error) {
+      this._error(`Failed to load system "${systemId}":`, error);
+      throw new Error(`Не удалось загрузить систему "${systemId}": ${error.message}`);
+    }
+  }
+  
+  // Теперь system — это объект с .id
+  if (!system || !system.id) {
+    throw new Error('System must have an "id" property');
   }
 
+  const oldSystem = this.activeSystem?.id;
+  this.activeSystem = system;
+
+  this._log(`🔄 System changed: ${oldSystem || 'none'} → ${system.id}`);
+  
+  // Уведомляем модули о смене системы
+  await this._notifyModules('onSystemChange', system);
+  
+  this._emit('system:changed', { 
+    systemId: system.id, 
+    system,
+    previous: oldSystem 
+  });
+
+  return true;
+}
   /**
    * Динамическая загрузка системы из модуля
    * @async
