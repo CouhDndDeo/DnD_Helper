@@ -172,33 +172,47 @@ async setActiveSystem(system) {
   return true;
 }
   /**
-   * Динамическая загрузка системы из модуля
-   * @async
-   * @param {string} systemId - 'dnd5e' | 'daggerheart'
-   * @param {Function} importFn - Функция динамического импорта
-   * @returns {Promise<RPGSystem>}
-   * 
-   * @example
-   * await manager.loadSystem('dnd5e', () => import('../systems/dnd5e.js'));
-   */
-  async loadSystem(systemId, importFn) {
-    try {
-      const module = await importFn();
-      const SystemClass = module[Object.keys(module)[0]];
+ * Динамическая загрузка системы из модуля
+ * @async
+ * @param {string} systemId - 'dnd5e' | 'daggerheart'
+ * @param {Function} importFn - Функция динамического импорта
+ * @returns {Promise<RPGSystem>}
+ */
+async loadSystem(systemId, importFn) {
+  try {
+    // Если importFn не передан, используем дефолтные пути
+    const loader = importFn || (() => {
+      // ✅ Пути относительно корня GitHub Pages сайта
+      const basePath = '/DnD_Helper/js/systems/';
       
-      if (!SystemClass) {
-        throw new Error(`No export found in system module "${systemId}"`);
+      const loaders = {
+        'dnd5e': () => import(`${basePath}dnd5e.js`),
+        'daggerheart': () => import(`${basePath}daggerheart.js`)
+      };
+      
+      if (!loaders[systemId]) {
+        throw new Error(`No loader for system "${systemId}"`);
       }
-      
-      const system = new SystemClass();
-      await this.setActiveSystem(system);
-      return system;
-      
-    } catch (error) {
-      this._error(`Failed to load system "${systemId}":`, error);
-      throw error;
+      return loaders[systemId]();
+    });
+    
+    const module = await loader();
+    const exports = Object.keys(module);
+    const SystemClass = module[exports.find(k => k.endsWith('System')) || exports[0]];
+    
+    if (!SystemClass) {
+      throw new Error(`No system class found in module "${systemId}"`);
     }
+    
+    const system = new SystemClass();
+    await this.setActiveSystem(system);
+    return system;
+    
+  } catch (error) {
+    console.error(`[ModuleManager] Failed to load system "${systemId}":`, error);
+    throw new Error(`Не удалось загрузить систему "${systemId}": ${error.message}`);
   }
+}
 
   // ============================================================================
   // ДОСТУП К МОДУЛЯМ
